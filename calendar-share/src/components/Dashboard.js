@@ -38,14 +38,16 @@ function Dashboard({ session }) {
             {
               id: session.user.id,
               email: session.user.email,
-              full_name: session.user.email.split('@')[0],
-              updated_at: new Date().toISOString(),
+              full_name: session.user.email.split('@')[0]
             }
           ])
           .select()
           .single();
 
-        if (insertError) throw insertError;
+        if (insertError) {
+          console.error('Error creating profile:', insertError);
+          throw insertError;
+        }
         setProfile(newProfile);
       } else {
         setProfile(data);
