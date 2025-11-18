@@ -28,22 +28,7 @@ function Login() {
 
         if (error) throw error;
 
-        // Create profile entry for the new user
-        if (data.user) {
-          const { error: profileError } = await supabase
-            .from('profiles')
-            .insert({
-              id: data.user.id,
-              email: email,
-              full_name: email.split('@')[0]
-            });
-
-          if (profileError) {
-            console.error('Error creating profile:', profileError);
-            // Don't throw - signup succeeded, profile creation is secondary
-          }
-        }
-
+        // Profile will be created automatically by database trigger
         setMessage({
           type: 'success',
           text: 'Account created! Check your email to confirm.'
