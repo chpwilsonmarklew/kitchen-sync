@@ -25,20 +25,59 @@ function Login() {
             }
           }
         });
-        
+
         if (error) throw error;
-        
-        setMessage({ 
-          type: 'success', 
-          text: 'Account created! Check your email to confirm.' 
+
+        // Create profile entry for the new user
+        if (data.user) {
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .insert({
+              id: data.user.id,
+              email: email,
+              full_name: email.split('@')[0]
+            });
+
+          if (profileError) {
+            console.error('Error creating profile:', profileError);
+            // Don't throw - signup succeeded, profile creation is secondary
+          }
+        }
+
+        setMessage({
+          type: 'success',
+          text: 'Account created! Check your email to confirm.'
         });
       } else {
         const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
-        
+
         if (error) throw error;
+
+        // Check if profile exists, create if not (for existing users)
+        if (data.user) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('id', data.user.id)
+            .single();
+
+          if (!profile) {
+            const { error: profileError } = await supabase
+              .from('profiles')
+              .insert({
+                id: data.user.id,
+                email: data.user.email,
+                full_name: data.user.email.split('@')[0]
+              });
+
+            if (profileError) {
+              console.error('Error creating profile:', profileError);
+            }
+          }
+        }
       }
     } catch (error) {
       setMessage({ 

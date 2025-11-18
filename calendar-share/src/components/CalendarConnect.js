@@ -59,11 +59,15 @@ function CalendarConnect({ session }) {
           user_id: session.user.id,
           google_calendar_connected: true,
           google_access_token: accessToken, // In production, encrypt this
-          calendars: data.items || [],
-          updated_at: new Date().toISOString()
+          calendars: data.items || []
+        }, {
+          onConflict: 'user_id'
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Database error:', error);
+        throw error;
+      }
 
       setMessage({ 
         type: 'success', 
@@ -87,23 +91,26 @@ function CalendarConnect({ session }) {
       const { error } = await supabase
         .from('calendar_connections')
         .update({
-          selected_calendars: selectedCalendars,
-          updated_at: new Date().toISOString()
+          selected_calendars: selectedCalendars
         })
         .eq('user_id', session.user.id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Database error:', error);
+        throw error;
+      }
 
-      setMessage({ 
-        type: 'success', 
-        text: 'Calendar preferences saved!' 
+      setMessage({
+        type: 'success',
+        text: 'Calendar preferences saved!'
       });
 
       setTimeout(() => navigate('/dashboard'), 1500);
     } catch (error) {
-      setMessage({ 
-        type: 'error', 
-        text: 'Failed to save calendar preferences' 
+      console.error('Error saving calendar preferences:', error);
+      setMessage({
+        type: 'error',
+        text: `Failed to save calendar preferences: ${error.message}`
       });
     }
   };
