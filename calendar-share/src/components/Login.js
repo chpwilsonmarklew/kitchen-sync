@@ -41,28 +41,7 @@ function Login() {
 
         if (error) throw error;
 
-        // Check if profile exists, create if not (for existing users)
-        if (data.user) {
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('id')
-            .eq('id', data.user.id)
-            .single();
-
-          if (!profile) {
-            const { error: profileError } = await supabase
-              .from('profiles')
-              .insert({
-                id: data.user.id,
-                email: data.user.email,
-                full_name: data.user.email.split('@')[0]
-              });
-
-            if (profileError) {
-              console.error('Error creating profile:', profileError);
-            }
-          }
-        }
+        // Profile is created automatically by database trigger on signup
       }
     } catch (error) {
       setMessage({ 
