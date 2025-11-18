@@ -12,7 +12,8 @@ function CalendarConnect({ session }) {
 
   // Google OAuth configuration
   const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID || 'YOUR_GOOGLE_CLIENT_ID';
-  const REDIRECT_URI = `${window.location.origin}/connect-calendar`;
+  // Use environment variable for production, fallback to current origin for local dev
+  const REDIRECT_URI = process.env.REACT_APP_REDIRECT_URL || `${window.location.origin}/connect-calendar`;
   const SCOPE = 'https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/calendar.events.readonly';
 
   useEffect(() => {
